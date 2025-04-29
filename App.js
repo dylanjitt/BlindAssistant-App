@@ -1,7 +1,10 @@
 import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
-import { Button, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Button, StyleSheet, Text, TouchableOpacity, View,Dimensions } from 'react-native';
+
+
+const screenHeight = Dimensions.get('window').height;
 
 export default function App() {
   const [facing, setFacing] = useState('back');
@@ -33,9 +36,12 @@ export default function App() {
   return (
     <View style={styles.container}>
       <StatusBar style='light'/>
-      <CameraView style={styles.camera} facing={facing}>
+      
+        <CameraView style={styles.camera} facing={facing}>
         
-      </CameraView>
+        </CameraView>
+      
+      
     </View>
   );
 }
@@ -43,7 +49,7 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     backgroundColor:'black'
   },
   message: {
@@ -51,7 +57,10 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
   },
   camera: {
-    aspectRatio:3/4
+    aspectRatio:375/565,
+    borderRadius:20,
+    marginTop: screenHeight * 0.1, // 5% of screen height
+    width:'100%'
   },
   buttonContainer: {
     flex: 1,
