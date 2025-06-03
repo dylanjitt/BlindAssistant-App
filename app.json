@@ -33,6 +33,11 @@
           "recordAudioAndroid": true
         }
       ]
-    ]
+    ],
+    "androidNavigationBar": {
+      "visible": "transparent",  
+      "barStyle": "dark-content",
+      "backgroundColor": "#000000"
+    }
   }
 }
