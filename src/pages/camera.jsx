@@ -1,5 +1,5 @@
 import React, { useRef, useState,useEffect } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Image, Dimensions, ActivityIndicator } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Image, Dimensions, ActivityIndicator, ScrollView } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { StatusBar } from 'expo-status-bar';
 // import * as FileSystem from 'expo-file-system';
@@ -70,14 +70,18 @@ export default function Camera() {
         <CameraView style={styles.camera} facing={facing} ref={cameraRef} />
       )}
       <View style={styles.bottomPart}>
-        <View style={{ flex: 1.5 }}>
+        
+        <View style={{ flex: 1.5 ,width:"100%"}}>
+        <ScrollView>
           {loading ? (
             <ActivityIndicator size="large" color="#fff" style={{ marginTop: 10 }} />
           ) : (
             <Text style={styles.resultText}>{responseText?.description}</Text>
           )}
+          </ScrollView>
+          
         </View>
-        <View style={{flex:2}}>
+        <View style={{flex:2,width:'100%'}}>
           <PhotoShutter takePhoto={takePicture} />
         </View>
 
@@ -98,7 +102,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'black',
     alignItems: 'center',
-    justifyContent: 'flex-start',
+    justifyContent: 'center',
+    width:'100%'
   },
   message: {
     color: 'white',
@@ -130,6 +135,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   bottomPart: {
-    flex: 1
+    flex: 1,
+    width:"100%"
   }
 });
