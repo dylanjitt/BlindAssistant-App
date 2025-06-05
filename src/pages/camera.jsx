@@ -22,15 +22,26 @@ export default function Camera() {
   const minibus  = process.env.MINIBUS
   const vision = process.env.VISION
   
-  const listModes=['money', 'minibus', 'vision']
+  const listModes=[ 'minibus', 'vision','money']
   const [mode, setMode] = useState(listModes[2])
   
-  const [modeCamera,setModeCamera]=useState('')
+  const [modeCamera,setModeCamera]=useState(vision)
 
   useEffect(() => {
     setBackgroundColorAsync('#000000'); 
     
   }, []);
+
+  useEffect(()=>{
+    if(mode==='money'){
+      setModeCamera(money)
+    }else if (mode==='minibus'){
+      setModeCamera(minibus)
+    }else {
+      setModeCamera(vision)
+    }
+    console.log('CURRENT MODE: ',mode)
+  },[mode])
 
   if (!permission) {
     return (
@@ -59,13 +70,7 @@ export default function Camera() {
       setResponseText('Analyzing image...');
       setLoading(true);
       setTaken(true)
-      if(mode===listModes[0]){
-        setModeCamera(money)
-      }else if (mode===listModes[1]){
-        setModeCamera(minibus)
-      }else{
-        setModeCamera(vision)
-      }
+      
       console.log(modeCamera)
       await sendPhoto(photo.uri, modeCamera, setResponseText, setLoading);
     } catch (error) {
@@ -107,6 +112,7 @@ export default function Camera() {
           backToPhoto={backToPhoto} 
           listModes={listModes} 
           setMode={setMode} 
+          mode={mode}
           />
         </View>
 
