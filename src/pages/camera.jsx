@@ -5,12 +5,14 @@ import { StatusBar } from 'expo-status-bar';
 import { sendPhoto } from '../services/cameraService';
 import PhotoShutter from '../components/button';
 import { setBackgroundColorAsync } from 'expo-system-ui';
+import * as Speech from 'expo-speech';
+
 
 const screenHeight = Dimensions.get('window').height;
 
 export default function Camera() {
   const [permission, requestPermission] = useCameraPermissions();
-  const [facing, setFacing] = useState('back');
+  const facing='back';
   const cameraRef = useRef(null);
   const [taken,setTaken]=useState(false)
 
@@ -27,6 +29,8 @@ export default function Camera() {
   
   const [modeCamera,setModeCamera]=useState(vision)
 
+  
+
   useEffect(() => {
     setBackgroundColorAsync('#000000'); 
     
@@ -35,10 +39,16 @@ export default function Camera() {
   useEffect(()=>{
     if(mode==='money'){
       setModeCamera(money)
+      Speech.speak('Modo billetes', { language: 'es-ES' });
+
     }else if (mode==='minibus'){
       setModeCamera(minibus)
+      Speech.speak('Modo minibus', { language: 'es-ES' });
+
     }else {
       setModeCamera(vision)
+      Speech.speak('Modo visión', { language: 'es-ES' });
+
     }
     console.log('CURRENT MODE: ',mode)
   },[mode])
@@ -64,19 +74,35 @@ export default function Camera() {
 
   const takePicture = async () => {
     if (!cameraRef.current) return;
+    
     try {
-      const photo = await cameraRef.current.takePictureAsync({ quality: 1 });
+      console.log('Taking picture...');
+      
+      // Reduce image quality for faster upload
+      const photo = await cameraRef.current.takePictureAsync({ 
+        quality: 0.8, 
+        skipProcessing: true,
+        base64:false
+      });
+      
       setPhotoUri(photo.uri);
       setResponseText('Analyzing image...');
       setLoading(true);
-      setTaken(true)
+      setTaken(true);
       
-      console.log(modeCamera)
+      console.log('Current mode:', mode);
+      console.log('Mode camera value:', modeCamera);
+      console.log('Photo URI:', photo.uri);
+      
+      // Send photo immediately after state updates
       await sendPhoto(photo.uri, modeCamera, setResponseText, setLoading);
+      Speech.speak(responseText?.description)
     } catch (error) {
       console.error('Error taking picture:', error);
+      setResponseText('Failed to take picture.');
+      setLoading(false);
     }
-  };
+  }; 
 
   const backToPhoto = () => {
     setPhotoUri(null);
