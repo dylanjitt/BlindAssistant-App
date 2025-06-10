@@ -6,7 +6,7 @@ import { sendPhoto } from '../services/cameraService';
 import PhotoShutter from '../components/button';
 import { setBackgroundColorAsync } from 'expo-system-ui';
 import * as Speech from 'expo-speech';
-
+import * as Haptics from 'expo-haptics';
 
 const screenHeight = Dimensions.get('window').height;
 
@@ -29,56 +29,46 @@ export default function Camera() {
   
   const [modeCamera,setModeCamera]=useState(vision)
 
-  
-
   useEffect(() => {
     setBackgroundColorAsync('#000000'); 
-    
+    requestPermission()
   }, []);
 
   useEffect(()=>{
     if(mode==='money'){
       setModeCamera(money)
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy)
       Speech.speak('Modo billetes', { language: 'es-ES' });
 
     }else if (mode==='minibus'){
       setModeCamera(minibus)
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy)
       Speech.speak('Modo minibus', { language: 'es-ES' });
 
     }else {
       setModeCamera(vision)
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy)
       Speech.speak('Modo visión', { language: 'es-ES' });
 
     }
     console.log('CURRENT MODE: ',mode)
   },[mode])
 
-  if (!permission) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.message}>Loading camera permissions...</Text>
-      </View>
-    );
-  }
+  useEffect(()=>{
+    if(responseText!==""){
+      Haptics.notificationAsync(
+        Haptics.NotificationFeedbackType.Warning
+      )
+      Speech.speak(responseText, { language: 'es-ES' });
+    }
+  },[responseText])
 
-  if (!permission.granted) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.message}>We need your permission to show the camera</Text>
-        <TouchableOpacity onPress={requestPermission} style={styles.button}>
-          <Text style={styles.text}>Grant Permission</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  }
 
   const takePicture = async () => {
     if (!cameraRef.current) return;
     
     try {
-      console.log('Taking picture...');
-      
-      // Reduce image quality for faster upload
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Rigid)
       const photo = await cameraRef.current.takePictureAsync({ 
         quality: 0.8, 
         skipProcessing: true,
@@ -86,17 +76,12 @@ export default function Camera() {
       });
       
       setPhotoUri(photo.uri);
-      setResponseText('Analyzing image...');
+      
       setLoading(true);
       setTaken(true);
       
-      console.log('Current mode:', mode);
-      console.log('Mode camera value:', modeCamera);
-      console.log('Photo URI:', photo.uri);
-      
-      // Send photo immediately after state updates
       await sendPhoto(photo.uri, modeCamera, setResponseText, setLoading);
-      Speech.speak(responseText?.description)
+      
     } catch (error) {
       console.error('Error taking picture:', error);
       setResponseText('Failed to take picture.');
@@ -108,6 +93,8 @@ export default function Camera() {
     setPhotoUri(null);
     setResponseText('')
     setTaken(false)
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
+    
   }
 
   return (
@@ -117,7 +104,12 @@ export default function Camera() {
       {photoUri ? (
         <Image source={{ uri: photoUri }} style={styles.camera} />
       ) : (
-        <CameraView style={styles.camera} facing={facing} ref={cameraRef} />
+        <View>
+           <View style={styles.topOverlay} />  
+        <CameraView style={styles.camera} facing={facing} ref={cameraRef}/>
+        
+        </View>
+       
       )}
       <View style={styles.bottomPart}>
 
@@ -126,7 +118,7 @@ export default function Camera() {
             {loading ? (
               <ActivityIndicator size="large" color="#fff" style={{ marginTop: 10 }} />
             ) : (
-              <Text style={styles.resultText}>{responseText?.description}</Text>
+              <Text style={styles.resultText}>{responseText}</Text>
             )}
           </ScrollView>
 
@@ -139,13 +131,11 @@ export default function Camera() {
           listModes={listModes} 
           setMode={setMode} 
           mode={mode}
+          loading={loading}
           />
         </View>
 
       </View>
-
-
-
     </View>
   );
 }
@@ -169,12 +159,15 @@ const styles = StyleSheet.create({
     marginTop: screenHeight * 0.075,
     width: '100%',
   },
-  captureButton: {
-    backgroundColor: '#1e90ff',
-    padding: 12,
-    marginTop: 20,
-    borderRadius: 10,
+  topOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 120,
+    backgroundColor: 'rgba(0,0,0,0.6)', // solid fade
   },
+  
   text: {
     fontWeight: 'bold',
     color: 'white',

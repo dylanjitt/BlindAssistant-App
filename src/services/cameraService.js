@@ -31,7 +31,7 @@ export const sendPhoto = async (uri, mode, setResponseText, setLoading) => {
     const response = await jsonServerInstance.post(mode, formData);
     
     console.log('Response received:', response.status);
-    setResponseText(response.data);
+    setResponseText(response.data.description);
     
   } catch (error) {
     console.error('Error sending photo:', error);

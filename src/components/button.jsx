@@ -1,42 +1,42 @@
-import React, { useState, useRef } from "react";
-import { StyleSheet, TouchableOpacity, View, Animated, PanResponder } from "react-native";
+import React, { useState, useRef, useEffect } from "react";
+import { StyleSheet, TouchableOpacity, View, Animated, PanResponder,Pressable } from "react-native";
 import { DollarIcon } from "./DollarIcon";
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import AntDesign from '@expo/vector-icons/AntDesign';
 
-const PhotoShutter = ({ takePhoto, taken, backToPhoto, listModes, setMode, mode }) => {
+const PhotoShutter = ({ takePhoto, taken, backToPhoto, listModes, setMode, mode, loading }) => {
   // Animation values
   const leftIconAnim = useRef(new Animated.Value(1)).current;
   const centerIconAnim = useRef(new Animated.Value(1)).current;
   const rightIconAnim = useRef(new Animated.Value(1)).current;
-  
+
   const leftPositionAnim = useRef(new Animated.Value(0)).current;
   const centerPositionAnim = useRef(new Animated.Value(0)).current;
   const rightPositionAnim = useRef(new Animated.Value(0)).current;
 
   // Get icon component based on mode
   const getIcon = (modeType) => {
-    switch(modeType) {
+    switch (modeType) {
       case 'money':
-        return <DollarIcon/>;
+        return <DollarIcon />;
       case 'minibus':
         return <FontAwesome5 name="car" size={55} color="black" />;
       case 'vision':
         return <Ionicons name="eye" size={55} color="black" />;
       default:
-        return <DollarIcon/>;
+        return <DollarIcon />;
     }
   };
 
   // Get current mode index
   const currentModeIndex = listModes.indexOf(mode || listModes[0]);
-  
+
   // Get modes for left, center, right positions
   const getModesForPositions = () => {
     const leftIndex = currentModeIndex === 0 ? listModes.length - 1 : currentModeIndex - 1;
     const rightIndex = currentModeIndex === listModes.length - 1 ? 0 : currentModeIndex + 1;
-    
+
     return {
       left: listModes[leftIndex],
       center: listModes[currentModeIndex],
@@ -98,14 +98,14 @@ const PhotoShutter = ({ takePhoto, taken, backToPhoto, listModes, setMode, mode 
             duration: duration,
             useNativeDriver: true,
           }),
-          
+
           // Right icon moves to center
           Animated.timing(rightPositionAnim, {
             toValue: -moveDistance,
             duration: duration,
             useNativeDriver: true,
           }),
-          
+
           // Left icon moves to right
           Animated.timing(leftPositionAnim, {
             toValue: moveDistance * 2,
@@ -117,7 +117,7 @@ const PhotoShutter = ({ takePhoto, taken, backToPhoto, listModes, setMode, mode 
           const newModeIndex = currentModeIndex === listModes.length - 1 ? 0 : currentModeIndex + 1;
           setMode(listModes[newModeIndex]);
           resetAnimations();
-          
+
         });
       } else {
         // Swipe right: move to previous mode
@@ -133,14 +133,14 @@ const PhotoShutter = ({ takePhoto, taken, backToPhoto, listModes, setMode, mode 
             duration: duration,
             useNativeDriver: true,
           }),
-          
+
           // Left icon moves to center
           Animated.timing(leftPositionAnim, {
             toValue: moveDistance,
             duration: duration,
             useNativeDriver: true,
           }),
-          
+
           // Right icon moves to left
           Animated.timing(rightPositionAnim, {
             toValue: -moveDistance * 2,
@@ -178,7 +178,7 @@ const PhotoShutter = ({ takePhoto, taken, backToPhoto, listModes, setMode, mode 
   };
 
   return (
-    <View style={styles.container} {...panResponder.panHandlers}>
+    <View style={styles.container} {...(!taken ? panResponder.panHandlers : {})}>
       {!taken ? (
         <>
           {/* Left button */}
@@ -191,7 +191,7 @@ const PhotoShutter = ({ takePhoto, taken, backToPhoto, listModes, setMode, mode 
               ]
             }
           ]}>
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.buttonTouchable}
               onPress={() => animateToNextMode('right')}
             >
@@ -223,7 +223,7 @@ const PhotoShutter = ({ takePhoto, taken, backToPhoto, listModes, setMode, mode 
               ]
             }
           ]}>
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.buttonTouchable}
               onPress={() => animateToNextMode('left')}
             >
@@ -233,9 +233,19 @@ const PhotoShutter = ({ takePhoto, taken, backToPhoto, listModes, setMode, mode 
         </>
       ) : (
         <View style={styles.mainButton}>
-          <TouchableOpacity onPress={backToCamera} style={styles.button}>
+          <Pressable
+            onPress={backToCamera}
+            disabled={loading}
+            style={({ pressed }) => [
+              styles.button,
+              {
+                opacity: loading ? 0.3 : (pressed ? 0.4 : 1),
+              }
+            ]}
+          >
             <AntDesign name="closecircle" size={55} color="black" />
-          </TouchableOpacity>
+          </Pressable>
+
         </View>
       )}
     </View>
