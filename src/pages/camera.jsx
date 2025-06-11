@@ -70,7 +70,7 @@ export default function Camera() {
     try {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Rigid)
       const photo = await cameraRef.current.takePictureAsync({ 
-        quality: 0.8, 
+        quality: 0.6, 
         skipProcessing: true,
         base64:false
       });
