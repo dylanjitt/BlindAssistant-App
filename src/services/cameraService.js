@@ -6,14 +6,6 @@ const API_URL = process.env.API_URL;
 
 export const sendPhoto = async (uri, mode, setResponseText, setLoading) => {
   try {
-    // Create axios instance with timeout and optimized settings
-    const apiInstance = axios.create({
-      baseURL: API_URL,
-      timeout: 60000, // 30 second timeout
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
 
     const fileInfo = await FileSystem.getInfoAsync(uri);
     

@@ -1,12 +1,11 @@
-import React, { useState, useRef, useEffect } from "react";
-import { StyleSheet, TouchableOpacity, View, Animated, PanResponder,Pressable } from "react-native";
+import React, { useRef } from "react";
+import { StyleSheet, TouchableOpacity, View, Animated, PanResponder, Pressable } from "react-native";
 import { DollarIcon } from "./DollarIcon";
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import AntDesign from '@expo/vector-icons/AntDesign';
 
-const PhotoShutter = ({ takePhoto, taken, backToPhoto, listModes, setMode, mode, loading }) => {
-  // Animation values
+const PhotoShutter = ({ takePhoto, taken, backToPhoto, listModes, setMode, mode, loading, orientation }) => {
   const leftIconAnim = useRef(new Animated.Value(1)).current;
   const centerIconAnim = useRef(new Animated.Value(1)).current;
   const rightIconAnim = useRef(new Animated.Value(1)).current;
@@ -15,24 +14,27 @@ const PhotoShutter = ({ takePhoto, taken, backToPhoto, listModes, setMode, mode,
   const centerPositionAnim = useRef(new Animated.Value(0)).current;
   const rightPositionAnim = useRef(new Animated.Value(0)).current;
 
-  // Get icon component based on mode
+  // 🔄 Get rotation transform style based on orientation
+  const getRotationStyle = () => {
+    return orientation === 'LANDSCAPE' ? { transform: [{ rotate: '90deg' }] } : {};
+  };
+
   const getIcon = (modeType) => {
+    const rotation = getRotationStyle();
     switch (modeType) {
       case 'money':
-        return <DollarIcon />;
+        return <DollarIcon style={rotation} />;
       case 'minibus':
-        return <FontAwesome5 name="car" size={55} color="black" />;
+        return <FontAwesome5 name="car" size={55} color="black" style={rotation} />;
       case 'vision':
-        return <Ionicons name="eye" size={55} color="black" />;
+        return <Ionicons name="eye" size={55} color="black" style={rotation} />;
       default:
-        return <DollarIcon />;
+        return <DollarIcon style={rotation} />;
     }
   };
 
-  // Get current mode index
   const currentModeIndex = listModes.indexOf(mode || listModes[0]);
 
-  // Get modes for left, center, right positions
   const getModesForPositions = () => {
     const leftIndex = currentModeIndex === 0 ? listModes.length - 1 : currentModeIndex - 1;
     const rightIndex = currentModeIndex === listModes.length - 1 ? 0 : currentModeIndex + 1;
@@ -46,25 +48,15 @@ const PhotoShutter = ({ takePhoto, taken, backToPhoto, listModes, setMode, mode,
 
   const modes = getModesForPositions();
 
-  // Pan responder for swipe detection
   const panResponder = PanResponder.create({
     onMoveShouldSetPanResponder: (evt, gestureState) => {
       return Math.abs(gestureState.dx) > 15 && Math.abs(gestureState.dy) < 100;
     },
-    // onPanResponderGrant: () => {
-    //   // Prevent multiple animations from running
-    // },
-    // onPanResponderMove: (evt, gestureState) => {
-    //   console.log(mode)
-    //   // Optional: Add real-time movement feedback here
-    // },
     onPanResponderRelease: (evt, gestureState) => {
       if (Math.abs(gestureState.dx) > 40) {
         if (gestureState.dx > 0) {
-          // Swipe right - move to previous mode
           animateToNextMode('right');
         } else {
-          // Swipe left - move to next mode
           animateToNextMode('left');
         }
       }
@@ -75,7 +67,6 @@ const PhotoShutter = ({ takePhoto, taken, backToPhoto, listModes, setMode, mode,
     const duration = 250;
     const moveDistance = 90;
 
-    // Reset all animations to start position before starting new animation
     Animated.parallel([
       Animated.timing(leftPositionAnim, { toValue: 0, duration: 0, useNativeDriver: true }),
       Animated.timing(centerPositionAnim, { toValue: 0, duration: 0, useNativeDriver: true }),
@@ -85,70 +76,55 @@ const PhotoShutter = ({ takePhoto, taken, backToPhoto, listModes, setMode, mode,
       Animated.timing(rightIconAnim, { toValue: 1, duration: 0, useNativeDriver: true }),
     ]).start(() => {
       if (direction === 'left') {
-        // Swipe left: move to next mode
         Animated.parallel([
-          // Center icon moves left and fades
           Animated.timing(centerPositionAnim, {
             toValue: -moveDistance,
-            duration: duration,
+            duration,
             useNativeDriver: true,
           }),
           Animated.timing(centerIconAnim, {
             toValue: 0.6,
-            duration: duration,
+            duration,
             useNativeDriver: true,
           }),
-
-          // Right icon moves to center
           Animated.timing(rightPositionAnim, {
             toValue: -moveDistance,
-            duration: duration,
+            duration,
             useNativeDriver: true,
           }),
-
-          // Left icon moves to right
           Animated.timing(leftPositionAnim, {
             toValue: moveDistance * 2,
-            duration: duration,
+            duration,
             useNativeDriver: true,
           }),
         ]).start(() => {
-          // Update mode
           const newModeIndex = currentModeIndex === listModes.length - 1 ? 0 : currentModeIndex + 1;
           setMode(listModes[newModeIndex]);
           resetAnimations();
-
         });
       } else {
-        // Swipe right: move to previous mode
         Animated.parallel([
-          // Center icon moves right and fades
           Animated.timing(centerPositionAnim, {
             toValue: moveDistance,
-            duration: duration,
+            duration,
             useNativeDriver: true,
           }),
           Animated.timing(centerIconAnim, {
             toValue: 0.6,
-            duration: duration,
+            duration,
             useNativeDriver: true,
           }),
-
-          // Left icon moves to center
           Animated.timing(leftPositionAnim, {
             toValue: moveDistance,
-            duration: duration,
+            duration,
             useNativeDriver: true,
           }),
-
-          // Right icon moves to left
           Animated.timing(rightPositionAnim, {
             toValue: -moveDistance * 2,
-            duration: duration,
+            duration,
             useNativeDriver: true,
           }),
         ]).start(() => {
-          // Update mode
           const newModeIndex = currentModeIndex === 0 ? listModes.length - 1 : currentModeIndex - 1;
           setMode(listModes[newModeIndex]);
           resetAnimations();
@@ -158,7 +134,6 @@ const PhotoShutter = ({ takePhoto, taken, backToPhoto, listModes, setMode, mode,
   };
 
   const resetAnimations = () => {
-    // Use immediate reset with duration 0
     Animated.parallel([
       Animated.timing(leftPositionAnim, { toValue: 0, duration: 0, useNativeDriver: true }),
       Animated.timing(centerPositionAnim, { toValue: 0, duration: 0, useNativeDriver: true }),
@@ -167,14 +142,6 @@ const PhotoShutter = ({ takePhoto, taken, backToPhoto, listModes, setMode, mode,
       Animated.timing(centerIconAnim, { toValue: 1, duration: 0, useNativeDriver: true }),
       Animated.timing(rightIconAnim, { toValue: 1, duration: 0, useNativeDriver: true }),
     ]).start();
-  };
-
-  const takePicture = () => {
-    takePhoto();
-  };
-
-  const backToCamera = () => {
-    backToPhoto();
   };
 
   return (
@@ -199,9 +166,9 @@ const PhotoShutter = ({ takePhoto, taken, backToPhoto, listModes, setMode, mode,
             </TouchableOpacity>
           </Animated.View>
 
-          {/* Center main button - container stays fixed */}
+          {/* Center main button */}
           <View style={styles.mainButton}>
-            <TouchableOpacity onPress={takePicture} style={styles.button}>
+            <TouchableOpacity onPress={takePhoto} style={styles.button}>
               <Animated.View style={{
                 transform: [
                   { translateX: centerPositionAnim },
@@ -234,7 +201,7 @@ const PhotoShutter = ({ takePhoto, taken, backToPhoto, listModes, setMode, mode,
       ) : (
         <View style={styles.mainButton}>
           <Pressable
-            onPress={backToCamera}
+            onPress={backToPhoto}
             disabled={loading}
             style={({ pressed }) => [
               styles.button,
@@ -243,9 +210,8 @@ const PhotoShutter = ({ takePhoto, taken, backToPhoto, listModes, setMode, mode,
               }
             ]}
           >
-            <AntDesign name="closecircle" size={55} color="black" />
+            <AntDesign name="closecircle" size={55} color="black" style={getRotationStyle()} />
           </Pressable>
-
         </View>
       )}
     </View>
@@ -253,6 +219,7 @@ const PhotoShutter = ({ takePhoto, taken, backToPhoto, listModes, setMode, mode,
 };
 
 export default PhotoShutter;
+
 
 const styles = StyleSheet.create({
   container: {
@@ -272,7 +239,9 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     display: 'flex',
     alignItems: "center",
-    justifyContent: "center"
+    justifyContent: "center",
+    
+    
   },
   button: {
     height: 87,
