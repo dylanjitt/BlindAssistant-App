@@ -19,7 +19,12 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
+      ],
+      "package": "com.dylanjitt.blindassistant"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -35,9 +40,14 @@
       ]
     ],
     "androidNavigationBar": {
-      "visible": "transparent",  
+      "visible": "transparent",
       "barStyle": "dark-content",
       "backgroundColor": "#000000"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "b59f55df-9848-4e20-b216-7ed90260dd77"
+      }
     }
   }
 }

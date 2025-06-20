@@ -224,11 +224,11 @@ export default PhotoShutter;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
+    alignItems: 'flex-end',
     justifyContent: 'center',
     flexDirection: 'row',
     width: '100%',
-    paddingBottom: 20
+    paddingBottom: 40//20
   },
   mainButton: {
     height: 94,
