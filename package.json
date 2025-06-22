@@ -13,6 +13,7 @@
     "axios": "^1.9.0",
     "bootstrap-icons": "^1.13.1",
     "expo": "^53.0.4",
+    "expo-av": "^15.1.6",
     "expo-camera": "~16.1.6",
     "expo-haptics": "~14.1.4",
     "expo-image-manipulator": "~13.1.7",
@@ -27,7 +28,8 @@
     "react-native-dotenv": "^3.4.11",
     "react-native-svg": "15.11.2",
     "react-native-tts": "^4.1.1",
-    "react-native-vector-icons": "^10.2.0"
+    "react-native-vector-icons": "^10.2.0",
+    "expo-dev-client": "~5.2.1"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

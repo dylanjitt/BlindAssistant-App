@@ -6,8 +6,8 @@ export const DollarIcon = ({ style }) => {
     <View
       style={[
         {
-          width: 55,
-          height: 55,
+          width: 50,
+          height: 50,
           backgroundColor: '#000',
           borderRadius: 50,
           display: 'flex',
@@ -17,7 +17,7 @@ export const DollarIcon = ({ style }) => {
         style // ✅ apply passed-in style (rotation, etc.)
       ]}
     >
-      <Foundation name='dollar' size={55} color={'#d9d9d9'} />
+      <Foundation name='dollar' size={50} color={'#d9d9d9'} />
     </View>
   )
 }

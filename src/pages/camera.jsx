@@ -1,15 +1,8 @@
-import React, { useRef, useState, useEffect } from 'react';
-import { StyleSheet, Text, View, Image, Dimensions, ActivityIndicator, ScrollView } from 'react-native';
-import { CameraView, useCameraPermissions } from 'expo-camera';
+import React from 'react';
+import { StyleSheet, View, Image, Dimensions } from 'react-native';
+import { CameraView } from 'expo-camera';
 import { StatusBar } from 'expo-status-bar';
-import { sendPhoto } from '../services/cameraService';
 import PhotoShutter from '../components/button';
-import { setBackgroundColorAsync } from 'expo-system-ui';
-import * as Speech from 'expo-speech';
-import * as Haptics from 'expo-haptics';
-import * as ScreenOrientation from 'expo-screen-orientation';
-import { DeviceMotion } from 'expo-sensors';
-import { Audio } from 'expo-av';
 import { ResponseLayout } from '../components/responseLayout';
 import { useCamera } from '../hooks/useCamera';
 
@@ -18,7 +11,7 @@ const screenWidth = Dimensions.get('window').width;
 
 export default function Camera() {
 
-  const {photoUri,getImageContainerStyle,getImageStyle,gyroOrientation,loading,responseText,facing,cameraRef,takePicture,taken,backToPhoto,listModes,setMode,mode}=useCamera()
+  const { photoUri,permission, getImageContainerStyle, getImageStyle, gyroOrientation, loading, responseText, facing, cameraRef, takePicture, taken, backToPhoto, listModes, setMode, mode } = useCamera()
   return (
     <View style={styles.container}>
       <StatusBar style="light" />
@@ -31,32 +24,28 @@ export default function Camera() {
             resizeMode="contain"
           />
           {gyroOrientation === 'LANDSCAPE' ? (
-          <View style={styles.landscapeResponseOverlay}>
-            <View style={styles.landscapeResponseContainer}>
-              <ResponseLayout 
-                loading={loading} 
-                responseText={responseText} 
-                styles={styles}
-              />
+            <View style={styles.landscapeResponseOverlay}>
+              <View style={styles.landscapeResponseContainer}>
+                <ResponseLayout
+                  loading={loading}
+                  responseText={responseText}
+                  styles={styles}
+                />
+              </View>
             </View>
-          </View>
-        ) : null}
+          ) : null}
         </View>
       ) : (
-        <View>
-          <View style={styles.topOverlay} />
-          <CameraView
-            style={styles.cameraPortrait}
-            facing={facing}
-            ref={cameraRef}
-          />
-        </View>
+        // <View>
+         
+         ( <CameraView style={styles.cameraPortrait} facing={facing} ref={cameraRef}/>)
+        
       )}
 
       <View style={styles.bottomPart}>
         <View style={{ flex: 1.5, width: "100%" }}>
-          {gyroOrientation==='PORTRAIT'?
-          <ResponseLayout loading={loading} responseText={responseText} styles={styles}/>:<></>
+          {gyroOrientation === 'PORTRAIT' ?
+            <ResponseLayout loading={loading} responseText={responseText} styles={styles} /> : <></>
           }
 
         </View>
@@ -123,7 +112,7 @@ const styles = StyleSheet.create({
     flex: 1,
     width: "100%"
   },
-   landscapeResponseOverlay: {
+  landscapeResponseOverlay: {
     position: 'absolute',
     top: 0,
     right: 330,

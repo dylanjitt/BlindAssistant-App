@@ -1,17 +1,13 @@
-import React, { useRef, useState, useEffect } from 'react';
-import { StyleSheet, Text, View, Image, Dimensions, ActivityIndicator, ScrollView } from 'react-native';
-import { CameraView, useCameraPermissions } from 'expo-camera';
-import { StatusBar } from 'expo-status-bar';
+import { useRef, useState, useEffect } from 'react';
+import { Dimensions} from 'react-native';
+import {  useCameraPermissions } from 'expo-camera';
 import { sendPhoto } from '../services/cameraService';
-import PhotoShutter from '../components/button';
 import { setBackgroundColorAsync } from 'expo-system-ui';
 import * as Speech from 'expo-speech';
 import * as Haptics from 'expo-haptics';
+import { Audio } from 'expo-av';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import { DeviceMotion } from 'expo-sensors';
-import { Audio } from 'expo-av';
-import { ResponseLayout } from '../components/responseLayout';
-
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
@@ -111,7 +107,7 @@ export const useCamera= () => {
   //   };
   // }, [taken]); // Added 'taken' to dependency array
   
-  // //orientation gyroscpe listener useEffect
+  // // //orientation gyroscpe listener useEffect
   // useEffect(() => {
   //   let lastSpoken = 'PORTRAIT';
   
@@ -195,19 +191,53 @@ export const useCamera= () => {
     try {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Rigid);
       const photo = await cameraRef.current.takePictureAsync({
-        quality: 0.7,
+        quality: 0.5,
         skipProcessing: true,
         base64: false,
-        exif: true,
+        exif: false,
+        scale:0.3,
       });
       
-      console.log('Photo dimensions:', photo.width, 'x', photo.height);
+      //console.log('Photo dimensions:', photo.width, 'x', photo.height);
+      console.log('Current orientation when taking photo:', gyroOrientation);
+
+    //   // Get available picture sizes to find an optimal one
+    // const availableSizes = await cameraRef.current.getAvailablePictureSizesAsync();
+    // console.log('Available picture sizes:', availableSizes);
+    
+    // // Find a size that's close to 1080p (1920x1080) but not too large
+    // // Look for sizes around 1080-2000 pixels on the smaller dimension
+    // const optimalSize = availableSizes.find(size => {
+    //   const [width, height] = size.split('x').map(Number);
+    //   const smallerDimension = Math.min(width, height);
+    //   return smallerDimension >= 960 && smallerDimension <= 1080;
+    // }) || availableSizes[Math.floor(availableSizes.length / 2)]; // Fallback to middle size
+    
+    // console.log('Selected picture size:', optimalSize);
+    
+    // // Optimized camera settings for faster processing
+    // const photo = await cameraRef.current.takePictureAsync({
+    //   quality: 0.6, 
+    //   skipProcessing: false, 
+    //   base64: false,
+    //   exif: false,
+    //   scale: 0.8, 
+    //   pictureSize: optimalSize, 
+    // });
+    
+    // console.log('Photo captured - dimensions:', photo.width, 'x', photo.height);
+    // console.log('Current orientation when taking photo:', gyroOrientation);
 
       setPhotoUri(photo.uri);
       setLoading(true);
       setTaken(true);
 
-      await sendPhoto(photo.uri, modeCamera, setResponseText, setLoading);
+      // Determine if we need to rotate the image
+      // Rotate when in PORTRAIT mode since camera captures in landscape by default
+      const shouldRotate = gyroOrientation === 'PORTRAIT';
+      console.log('Should rotate image:', shouldRotate);
+
+      await sendPhoto(photo.uri, modeCamera, setResponseText, setLoading, shouldRotate);
 
     } catch (error) {
       console.error('Error taking picture:', error);
@@ -249,5 +279,5 @@ const getImageStyle = () => {
   };
 };
 
-return{photoUri,getImageContainerStyle,getImageStyle,gyroOrientation,loading,responseText,facing,cameraRef,takePicture,taken,backToPhoto,listModes,setMode,mode}
+return{photoUri,permission,getImageContainerStyle,getImageStyle,gyroOrientation,loading,responseText,facing,cameraRef,takePicture,taken,backToPhoto,listModes,setMode,mode}
 }
