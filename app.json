@@ -37,10 +37,10 @@
           "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone",
           "recordAudioAndroid": true
         }
-      ]
+      ],
+      "expo-font"
     ],
     "androidNavigationBar": {
-      "visible": "transparent",
       "barStyle": "dark-content",
       "backgroundColor": "#000000"
     },

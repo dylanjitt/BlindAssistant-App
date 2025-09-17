@@ -37,7 +37,6 @@ export const useCamera= () => {
   useEffect(() => {
     setBackgroundColorAsync('#000000');
     requestPermission();
-    //soundRef.current.loadAsync(require('../../assets/loading.wav'));
     
   }, []);
   useEffect(() => {
@@ -200,33 +199,6 @@ export const useCamera= () => {
       
       //console.log('Photo dimensions:', photo.width, 'x', photo.height);
       console.log('Current orientation when taking photo:', gyroOrientation);
-
-    //   // Get available picture sizes to find an optimal one
-    // const availableSizes = await cameraRef.current.getAvailablePictureSizesAsync();
-    // console.log('Available picture sizes:', availableSizes);
-    
-    // // Find a size that's close to 1080p (1920x1080) but not too large
-    // // Look for sizes around 1080-2000 pixels on the smaller dimension
-    // const optimalSize = availableSizes.find(size => {
-    //   const [width, height] = size.split('x').map(Number);
-    //   const smallerDimension = Math.min(width, height);
-    //   return smallerDimension >= 960 && smallerDimension <= 1080;
-    // }) || availableSizes[Math.floor(availableSizes.length / 2)]; // Fallback to middle size
-    
-    // console.log('Selected picture size:', optimalSize);
-    
-    // // Optimized camera settings for faster processing
-    // const photo = await cameraRef.current.takePictureAsync({
-    //   quality: 0.6, 
-    //   skipProcessing: false, 
-    //   base64: false,
-    //   exif: false,
-    //   scale: 0.8, 
-    //   pictureSize: optimalSize, 
-    // });
-    
-    // console.log('Photo captured - dimensions:', photo.width, 'x', photo.height);
-    // console.log('Current orientation when taking photo:', gyroOrientation);
 
       setPhotoUri(photo.uri);
       setLoading(true);

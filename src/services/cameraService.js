@@ -7,30 +7,21 @@ const API_URL = process.env.API_URL;
 export const sendPhoto = async (uri, mode, setResponseText, setLoading, shouldRotate = false) => {
   try {
     let finalUri = uri;
-    
-    // Rotate image if needed (when in portrait mode)
-    //if (shouldRotate) {
-      //console.log('Rotating image 90 degrees...');
       const manipulatedImage = await ImageManipulator.manipulateAsync(
         uri,
-        
         [
           {resize:{ width: 960, height: 1280 }},
-          //{ rotate: 0 }// Rotate 90 degrees clockwise
+
         ], 
         { 
-          compress: 0.5, // Same compression as your camera settings
+          compress: 0.5, 
           format: ImageManipulator.SaveFormat.JPEG 
         }
       );
       finalUri = manipulatedImage.uri;
-      //console.log('Image rotated successfully');
-    //}
 
     const fileInfo = await FileSystem.getInfoAsync(finalUri);
 
-   
-    // Create FormData more efficiently
     const formData = new FormData();
     formData.append('file', {
       uri: fileInfo.uri,

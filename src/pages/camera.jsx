@@ -36,8 +36,7 @@ export default function Camera() {
           ) : null}
         </View>
       ) : (
-        // <View>
-         
+ 
          ( <CameraView style={styles.cameraPortrait} facing={facing} ref={cameraRef}/>)
         
       )}
