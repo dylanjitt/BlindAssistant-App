@@ -1,4 +1,3 @@
-import * as FileSystem from 'expo-file-system';
 import * as ImageManipulator from 'expo-image-manipulator';
 import jsonServerInstance from '../api/jsonInstance';
 
@@ -6,36 +5,37 @@ const API_URL = process.env.API_URL;
 
 export const sendPhoto = async (uri, mode, setResponseText, setLoading, shouldRotate = false) => {
   try {
-    let finalUri = uri;
-      const manipulatedImage = await ImageManipulator.manipulateAsync(
-        uri,
-        [
-          {resize:{ width: 960, height: 1280 }},
+    // Manipulate image: resize + compress
+    const manipulatedImage = await ImageManipulator.manipulateAsync(
+      uri,
+      [
+        { resize: { width: 960, height: 1280 } },
+        ...(shouldRotate ? [{ rotate: 90 }] : []), // optional rotation if needed
+      ],
+      {
+        compress: 0.5, // 50% compression
+        format: ImageManipulator.SaveFormat.JPEG,
+      }
+    );
 
-        ], 
-        { 
-          compress: 0.5, 
-          format: ImageManipulator.SaveFormat.JPEG 
-        }
-      );
-      finalUri = manipulatedImage.uri;
+    const finalUri = manipulatedImage.uri;
 
-    const fileInfo = await FileSystem.getInfoAsync(finalUri);
-
+    // Create FormData directly with manipulated image
     const formData = new FormData();
     formData.append('file', {
-      uri: fileInfo.uri,
+      uri: finalUri,
       type: 'image/jpeg',
       name: 'photo.jpg',
     });
 
     console.log('Sending request to:', `${API_URL}${mode}`);
-    console.log('File size:', fileInfo.size);
-    
-    const response = await jsonServerInstance.post(mode, formData);
+
+    const response = await jsonServerInstance.post(mode, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+
     console.log('Response received:', response.status);
     setResponseText(response.data.description);
-    
   } catch (error) {
     console.error('Error al enviar foto:', error);
     if (error.code === 'ECONNABORTED') {

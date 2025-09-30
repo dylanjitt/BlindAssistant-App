@@ -3,7 +3,6 @@ import { StyleSheet, TouchableOpacity, View, Animated, PanResponder, Pressable }
 import { DollarIcon } from "./DollarIcon";
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import AntDesign from '@expo/vector-icons/AntDesign';
 
 const PhotoShutter = ({ takePhoto, taken, backToPhoto, listModes, setMode, mode, loading, orientation }) => {
   const leftIconAnim = useRef(new Animated.Value(1)).current;
@@ -210,7 +209,7 @@ const PhotoShutter = ({ takePhoto, taken, backToPhoto, listModes, setMode, mode,
               }
             ]}
           >
-            <AntDesign name="closecircle" size={55} color="black" style={getRotationStyle()} />
+            <Ionicons name="close-circle" size={70} color="black" style={getRotationStyle()} />
           </Pressable>
         </View>
       )}
