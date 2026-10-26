@@ -1,26 +1,23 @@
 import * as ImageManipulator from 'expo-image-manipulator';
 import jsonServerInstance from '../api/jsonInstance';
-
-const API_URL = process.env.API_URL;
+import { API_URL } from 'react-native-dotenv';
 
 export const sendPhoto = async (uri, mode, setResponseText, setLoading, shouldRotate = false) => {
   try {
-    // Manipulate image: resize + compress
     const manipulatedImage = await ImageManipulator.manipulateAsync(
       uri,
       [
         { resize: { width: 960, height: 1280 } },
-        ...(shouldRotate ? [{ rotate: 90 }] : []), // optional rotation if needed
+        ...(shouldRotate ? [{ rotate: 90 }] : []),
       ],
       {
-        compress: 0.5, // 50% compression
+        compress: 0.5,
         format: ImageManipulator.SaveFormat.JPEG,
       }
     );
 
     const finalUri = manipulatedImage.uri;
 
-    // Create FormData directly with manipulated image
     const formData = new FormData();
     formData.append('file', {
       uri: finalUri,
@@ -36,8 +33,10 @@ export const sendPhoto = async (uri, mode, setResponseText, setLoading, shouldRo
 
     console.log('Response received:', response.status);
     setResponseText(response.data.description);
+
   } catch (error) {
     console.error('Error al enviar foto:', error);
+
     if (error.code === 'ECONNABORTED') {
       setResponseText('Request timeout. Please try again.');
     } else if (error.response) {
@@ -47,6 +46,7 @@ export const sendPhoto = async (uri, mode, setResponseText, setLoading, shouldRo
     } else {
       setResponseText('No se pudo analizar la imagen, intente nuevamente');
     }
+
   } finally {
     setLoading(false);
   }

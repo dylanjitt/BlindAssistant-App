@@ -5,10 +5,11 @@ import { sendPhoto } from '../services/cameraService';
 import { setBackgroundColorAsync } from 'expo-system-ui';
 import * as Speech from 'expo-speech';
 import * as Haptics from 'expo-haptics';
-import { Audio } from 'expo-av';
+//import { Audio } from 'expo-av';
+import { useAudioPlayer } from 'expo-audio';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import { DeviceMotion } from 'expo-sensors';
-
+import { API_URL, MONEY, MINIBUS, VISION } from 'react-native-dotenv';
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
 
@@ -21,9 +22,9 @@ export const useCamera= () => {
   const [loading, setLoading] = useState(false);
   const [responseText, setResponseText] = useState('');
 
-  const money = process.env.MONEY;
-  const minibus = process.env.MINIBUS;
-  const vision = process.env.VISION;
+  const money = MONEY;
+  const minibus = MINIBUS;
+  const vision = VISION;
 
   const listModes = ['minibus', 'vision', 'money'];
   const [mode, setMode] = useState(listModes[2]);
@@ -32,7 +33,8 @@ export const useCamera= () => {
   const [gyroOrientation, setGyroOrientation] = useState('PORTRAIT'); // for icon rotation
   const lastAnnouncedOrientation = useRef('PORTRAIT');
 
-  const soundRef = useRef(new Audio.Sound());
+ // const soundRef = useRef(new Audio.Sound());
+  const player = useAudioPlayer(require('../../assets/loading.wav'));
 
   useEffect(() => {
     setBackgroundColorAsync('#000000');
@@ -42,9 +44,10 @@ export const useCamera= () => {
   useEffect(() => {
     (async () => {
       try {
-        await soundRef.current.loadAsync(require('../../assets/loading.wav'));
+        //await soundRef.current.loadAsync(require('../../assets/loading.wav'));
         // set to play only once
-        await soundRef.current.setIsLoopingAsync(false);
+        //await soundRef.current.setIsLoopingAsync(false);
+        player.play();
       } catch (e) {
         console.warn('Could not load sound', e);
       }
